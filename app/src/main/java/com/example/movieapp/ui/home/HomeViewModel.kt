@@ -8,6 +8,7 @@ import com.example.movieapp.domain.usecase.GetMovieNewsUseCase
 import com.example.movieapp.domain.usecase.GetMovieTriviaUseCase
 import com.example.movieapp.domain.usecase.GetPopularMoviesUseCase
 import com.example.movieapp.domain.usecase.SearchMovieUseCase
+import com.example.movieapp.domain.usecase.GetNowPlayingMoviesUseCase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,8 @@ class HomeViewModel (
     private val getPopularMoviesUseCase: GetPopularMoviesUseCase,
     private val getMovieNewsUseCase: GetMovieNewsUseCase,
     private val getMovieTriviaUseCase: GetMovieTriviaUseCase,
-    private val searchMovieUseCase: SearchMovieUseCase
+    private val searchMovieUseCase: SearchMovieUseCase,
+    private val getNowPlayingMoviesUseCase: GetNowPlayingMoviesUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
@@ -37,6 +39,10 @@ class HomeViewModel (
     private val _searchResult = MutableStateFlow<List<Movie>>(emptyList())
     val searchResult: StateFlow<List<Movie>> = _searchResult.asStateFlow()
 
+    // State untuk film On Now Playing
+    private val _nowPlayingMovies = MutableStateFlow<List<Movie>>(emptyList())
+    val nowPlayingMovies: StateFlow<List<Movie>> = _nowPlayingMovies
+
     init {
         loadHomeScreenData()
     }
@@ -47,12 +53,20 @@ class HomeViewModel (
             _uiState.value = HomeUiState.Loading
 
             val moviesDeferred = async { getPopularMoviesUseCase() }
+            val nowPlayingDeffered = async { getNowPlayingMoviesUseCase() }
             val newsDeferred = async { getMovieNewsUseCase() }
             val triviaDeferred = async { getMovieTriviaUseCase() }
 
+
             val moviesResult = moviesDeferred.await()
+            val nowPlayingResult = nowPlayingDeffered.await()
             val newsResult = newsDeferred.await()
             val triviaResult = triviaDeferred.await()
+
+            if (nowPlayingResult.isSuccess) {
+                val nowPlayingList = nowPlayingResult.getOrDefault(emptyList())
+                _nowPlayingMovies.value = nowPlayingList
+                }
 
             if (moviesResult.isSuccess) {
                 originalMoviesList = moviesResult.getOrDefault(emptyList())

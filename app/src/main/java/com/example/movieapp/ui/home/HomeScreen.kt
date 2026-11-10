@@ -20,6 +20,7 @@ import org.koin.androidx.compose.koinViewModel
 import com.example.movieapp.ui.news.NewsViewModel
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.ui.platform.LocalContext
+import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.ui.trivia.TriviaViewModel
 
 
@@ -40,7 +41,11 @@ fun HomeScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedGenre by viewModel.selectedGenre.collectAsState()
     val searchResults by viewModel.searchResult.collectAsState()
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
 
+    // Ambil state data On Now Playing dari ViewModel
+    val nowPlayingMovies by viewModel.nowPlayingMovies.collectAsState()
+    var selectedMovieForPreview by remember { mutableStateOf<Movie?>(null) }
     var isSearchActive by remember { mutableStateOf(false) }
 
 
@@ -104,7 +109,7 @@ fun HomeScreen(
                             )
                         }
 
-                        // 2. Filter Genre
+                        // 3. Filter Genre
                         item {
                             GenreChipGroup(
                                 selectedGenre = selectedGenre,
@@ -113,17 +118,31 @@ fun HomeScreen(
                             )
                         }
 
-                        // 3. Horizontal Grid Section
+                        // 4. Horizontal Grid Section (Popular Movies)
                         item {
                             HorizontalGridSection(
                                 title = if (selectedGenre == Genre.ALL) "Popular Movies" else "Film ${selectedGenre.displayName}",
                                 movies = state.movies,
-                                onMovieClick = { movie -> onMovieClick(movie.id)},
+                                onMovieClick = { movie ->
+                                    selectedMovieForPreview = movie
+                                     },
                                 onSeeAllClick = onSeeAllClick
                             )
                         }
 
-                        // 4. News Section
+                        // 5. On Now Playing Section (Baru ditambahkan)
+                        item {
+                            HorizontalGridSection(
+                                title = "On Now Playing",
+                                movies = nowPlayingMovies,
+                                onMovieClick = { movie ->
+                                    selectedMovieForPreview = movie
+                                },
+                                onSeeAllClick = {}
+                            )
+                        }
+
+                        // 6. News Section
                         item {
                             NewsSection(
                                 newsList = newsList,
@@ -137,7 +156,7 @@ fun HomeScreen(
                             )
                         }
 
-                        // 5. Trivia Section (Placeholder dulu sampai model/usecase Trivia dibuat)
+                        // 7. Trivia Section (Placeholder dulu sampai model/usecase Trivia dibuat)
                         item { TriviaSection(triviaList = triviaList) }
                     }
                 }
@@ -160,6 +179,16 @@ fun HomeScreen(
                     }
                 )
             }
+
+            MovieQuickPreviewSheet(
+                movie = selectedMovieForPreview,
+                lifecycleOwner = lifecycleOwner,
+                onDismiss = { selectedMovieForPreview = null },
+                onviewDetailClick = { movieId ->
+                    selectedMovieForPreview = null
+                    onMovieClick(movieId)
+                }
+            )
         }
     }
 

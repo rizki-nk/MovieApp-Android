@@ -9,7 +9,7 @@ interface ApiService {
     @GET("movie/popular")
     suspend fun getPopularMovies(
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = "id-ID",
+        @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1
     ) : MovieResponseDto
 
@@ -27,6 +27,23 @@ interface ApiService {
         @Query("language") language: String = "en-US",
         @Query("append_to_response") appendToResponse: String = "credits,videos"
     ): MovieDetailResponseDto
+
+    //Baru tambahan now Playing
+    @GET("movie/now_playing")
+    suspend fun getNowPlayingMovies(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1
+    ) : MovieResponseDto
+
+    //untuk trailer youtube
+    @GET("movie/{movie_id}/videos")
+    suspend fun getMovieVideos(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("languange") language: String = "en-US"
+    ) : MovieResponseDto
+
 
     companion object {
         const val BASE_URL = "https://api.themoviedb.org/3/"

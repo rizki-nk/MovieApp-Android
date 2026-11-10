@@ -1,7 +1,6 @@
 package com.example.movieapp.ui.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
@@ -30,8 +29,6 @@ fun YouTubePlayerSection(
 
     AndroidView(
        modifier = modifier
-           .fillMaxWidth()
-           .height(220.dp)
            .clip(RoundedCornerShape(12.dp)),
         factory = { context ->
             YouTubePlayerView(context).apply {

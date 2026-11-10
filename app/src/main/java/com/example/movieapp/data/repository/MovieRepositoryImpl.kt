@@ -7,12 +7,15 @@ import com.example.movieapp.domain.repository.MovieRepository
 
 class MovieRepositoryImpl(
     private val apiService: ApiService,
-    private val apiKey: String// Atau diambil dari BuildConfig / sumber lain
+    private val apiKey: String
 ) : MovieRepository {
 
     override suspend fun getPopularMovies(): Result<List<Movie>> {
         return try {
-            val response = apiService.getPopularMovies(apiKey = apiKey)
+            val response = apiService.getPopularMovies(
+                apiKey = apiKey,
+                language = "en-US"
+            )
             val movieList = response.results?.map { it.toDomainModel() } ?: emptyList()
             Result.success(movieList)
         } catch (e: Exception) {
@@ -44,6 +47,19 @@ class MovieRepositoryImpl(
                 appendToResponse = "credits,videos",
                 )
             Result.success(response.toDomainModel())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getNowPlayingMovies(): Result<List<Movie>> {
+        return try {
+            val response = apiService.getNowPlayingMovies(
+                apiKey = apiKey,
+                language = "en-US"
+            ) // Sesuaikan parameter
+            val movies = response.results.map { it.toDomainModel() } ?: emptyList()
+            Result.success(movies)
         } catch (e: Exception) {
             Result.failure(e)
         }

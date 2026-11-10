@@ -3,6 +3,7 @@ package com.example.movieapp.di
 import com.example.movieapp.domain.usecase.GetMovieByIdUseCase
 import com.example.movieapp.domain.usecase.GetMovieNewsUseCase
 import com.example.movieapp.domain.usecase.GetMovieTriviaUseCase
+import com.example.movieapp.domain.usecase.GetNowPlayingMoviesUseCase
 import com.example.movieapp.domain.usecase.GetPopularMoviesUseCase
 import com.example.movieapp.domain.usecase.SearchMovieUseCase
 import com.example.movieapp.ui.detail.DetailViewModel
@@ -13,6 +14,7 @@ import org.koin.dsl.module
 val viewModelModule = module {
 
     factory { GetPopularMoviesUseCase(get()) }
+    factory { GetNowPlayingMoviesUseCase(get()) }
     factory { GetMovieNewsUseCase(get()) }
     factory { GetMovieTriviaUseCase(get()) }
     factory { SearchMovieUseCase(get()) }
@@ -24,7 +26,8 @@ val viewModelModule = module {
             getPopularMoviesUseCase = get(),
             getMovieNewsUseCase = get(),
             getMovieTriviaUseCase = get(),
-            searchMovieUseCase = get()
+            searchMovieUseCase = get(),
+            getNowPlayingMoviesUseCase = get()
         )
     }
 
